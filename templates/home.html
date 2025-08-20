@@ -1,0 +1,292 @@
+{% extends 'base.html' %}
+
+{% load custom_filters %}
+
+{% block content %}
+
+<div class="max-w-6xl mx-auto px-4 py-8">
+        <!-- X Posts Section -->
+        <section class="space-y-6">
+            <!-- Section Header -->
+            <div class="flex items-center space-x-3 mb-8">
+                <div class="w-1 h-8 bg-gradient-to-b from-purple-500 to-pink-500 rounded-full"></div>
+                <h2 class="text-3xl font-bold text-white">Ani Posts</h2>
+                <div class="flex-1 h-px bg-gradient-to-r from-gray-700 to-transparent"></div>
+            </div>
+
+            <!-- Create New Post -->
+                    <div class="bg-gray-900 border border-gray-700 rounded-xl p-3 sm:p-4 md:p-6 shadow-lg">
+                        <form method="POST" action="{% url 'new_post' %}" class="space-y-3 sm:space-y-4">
+                            {% csrf_token %}
+                            <div class="flex items-start space-x-2 sm:space-x-3 md:space-x-4">
+                                <!-- User Avatar -->
+                                <div class="flex-shrink-0">
+                                        <img src="{{ user_img.url }}"
+                                        class="w-10 h-10 rounded-full border-2 border-gray-600 object-cover" alt="{{ user_name }}">
+                                </div>
+                                <!-- Post Input Area -->
+                                <div class="flex-1 space-y-3 sm:space-y-4">
+                                    <textarea
+                                        name="content"
+                                        id="post-content"
+                                        placeholder="What's happening in the anime world? Share your thoughts..."
+                                        class="w-full bg-gray-800 border border-gray-600 rounded-lg p-3 sm:p-4 text-white placeholder-gray-400 resize-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 min-h-[100px] sm:min-h-[120px] text-sm sm:text-base"
+                                        maxlength="500"
+                                        required
+                                    ></textarea>
+                                    <!-- Post Actions -->
+                                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+                                        <div class="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 text-xs sm:text-sm text-gray-400">
+                                            <span id="char-count" class="font-medium">0/500</span>
+                                            <div class="flex items-center space-x-2">
+                                                <svg class="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                </svg>
+                                                <span class="hidden sm:inline">Max 500 characters</span>
+                                                <span class="sm:hidden">Max 500 chars</span>
+                                            </div>
+                                        </div>
+                                        <button
+                                            type="submit"
+                                            id="post-button"
+                                            class="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold px-4 sm:px-6 py-2.5 sm:py-2 rounded-lg transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm sm:text-base"
+                                        >
+                                            Post
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+            <!-- Posts Feed -->
+            <div class="space-y-4">
+                {% if posts %}
+                    {% for post in posts %}
+                    <article class="bg-gray-900 border border-gray-700 rounded-xl p-6 shadow-lg hover:border-gray-600 transition-all duration-200 relative group">
+                    <!-- Post Header -->
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center space-x-3">
+                            <!-- User Avatar -->
+                            <img src="{{ post.avatar_url }}"
+                                 alt="{{ post.user.username }}"
+                                 class="w-10 h-10 rounded-full border-2 border-gray-600 object-cover">
+
+                            <!-- User Info -->
+                            <div>
+                                <h3 class="font-semibold text-white hover:text-purple-400 cursor-pointer transition-colors">
+                                    {{ post.user.username }}
+                                </h3>
+                            </div>
+                        </div>
+
+                        <!-- Timestamp -->
+                        <div class="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm text-gray-400 flex-shrink-0">
+                            <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <time datetime="{{ post.created_at|date:'c' }}" class="whitespace-nowrap">
+                                <span class="hidden sm:inline">{{ post.created_at|custom_time_display }}</span>
+                                <span class="sm:hidden">{{ post.created_at|custom_time_display }}</span>
+                            </time>
+                        </div>
+                    </div>
+
+                    <!-- Post Content - Make it clickable -->
+                    <a href="{% url 'post_detail' post.id %}" class="block mb-4 hover:no-underline">
+                        <p class="text-gray-200 leading-relaxed whitespace-pre-wrap line-clamp-3 group-hover:text-gray-100 transition-colors">{{ post.content }}</p>
+                    </a>
+
+                    <!-- Post Actions -->
+                    <div class="flex items-center justify-between pt-4 border-t border-gray-700">
+                        <div class="flex items-center space-x-6">
+                            <!-- Like Button -->
+                            <button onclick="event.preventDefault(); toggleLike({{ post.id }}, this)"
+                                class="flex items-center space-x-2 transition-colors group relative z-20
+                                {% if post.liked %} text-red-500 {% else %} text-gray-400 hover:text-red-400 {% endif %}">
+
+                                <svg class="w-5 h-5 group-hover:scale-110 transition-transform"
+                                    fill="{% if post.liked %}currentColor{% else %}none{% endif %}"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0
+                                        00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0
+                                        00-6.364 0z"></path>
+                                </svg>
+
+                                <span class="text-sm likes-count">{{ post.likes_count|default:"0" }}</span>
+                            </button>
+
+                            <!-- Comment Button - Links to post detail -->
+                            <a href="{% url 'post_detail' post.id %}#comment-form"
+                               class="flex items-center space-x-2 text-gray-400 hover:text-blue-400 transition-colors group relative z-20">
+                                <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                </svg>
+                                <span class="text-sm">{{ post.comments.count|default:"0" }}</span>
+                            </a>
+
+                            <!-- Share Button -->
+                            <button onclick="event.preventDefault(); sharePost({{ post.id }})"
+                                    class="flex items-center space-x-2 text-gray-400 hover:text-green-400 transition-colors group relative z-20">
+                                <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
+                                </svg>
+                                <span class="text-sm">Share</span>
+                            </button>
+                        </div>
+
+                        <!-- Post Menu -->
+                        <div class="relative inline-block text-left z-20">
+                            <button onclick="event.preventDefault(); toggleMenu(this)"
+                                class="text-gray-400 hover:text-white p-2 rounded-full hover:bg-gray-800 transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+                                </svg>
+                            </button>
+
+                            {% if request.user == post.user or request.user.is_superuser%}
+                            <!-- Dropdown -->
+                            <div class="hidden absolute right-0 w-[84px] h-8 rounded-lg shadow-lg bg-red-600 border border-gray-700 z-10">
+                                <form method="POST" action="{% url 'delete_post' post.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit"
+                                        onclick="return confirm('Are you sure you want to delete this post?');"
+                                        class="block w-full text-left text-white hover:bg-red-700 rounded-lg px-4 py-1">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+                {% else %}
+                    <!-- Empty State -->
+                    <div class="text-center py-16">
+                        <div class="bg-gray-900 border border-gray-700 rounded-xl p-12">
+                            <div class="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-300 mb-2">No posts yet</h3>
+                            <p class="text-gray-400 mb-6">Be the first to share what's happening in the anime world!</p>
+                            <button onclick="document.querySelector('textarea[name=content]').focus()"
+                                    class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-200">
+                                Create First Post
+                            </button>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Load More Button (if pagination is implemented) -->
+            {% if has_more_posts %}
+            <div class="text-center pt-8">
+                <button class="bg-gray-800 hover:bg-gray-700 text-white font-medium px-8 py-3 rounded-lg border border-gray-600 transition-colors duration-200">
+                    Load More Posts
+                </button>
+            </div>
+            {% endif %}
+        </section>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        window.addEventListener("pageshow", function (event) {
+            // if page was restored from cache (back/forward navigation)
+            if (event.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
+                window.location.reload();
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const textarea = document.getElementById("post-content");
+            const charCount = document.getElementById("char-count");
+            const postButton = document.getElementById("post-button");
+            const maxChars = 500;
+
+            textarea.addEventListener("input", function () {
+                const currentLength = textarea.value.length;
+                charCount.textContent = `${currentLength}/${maxChars}`;
+
+                // Change color when close to limit
+                charCount.style.color = currentLength > maxChars - 20 ? "red" : "";
+
+                // Enable/disable post button
+                postButton.disabled = currentLength === 0 || currentLength > maxChars;
+            });
+        });
+
+        function toggleMenu(button) {
+            // Close all open menus
+            document.querySelectorAll('.relative .absolute').forEach(menu => {
+                menu.classList.add('hidden');
+            });
+
+            // Toggle the menu for the clicked button
+            const menu = button.parentElement.querySelector('.absolute');
+            if (menu) {
+                menu.classList.toggle('hidden');
+            }
+        }
+
+        // Close dropdown if clicked outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.relative')) {
+                document.querySelectorAll('.relative .absolute').forEach(menu => {
+                    menu.classList.add('hidden');
+                });
+            }
+        });
+
+        function toggleLike(postId, button) {
+            fetch(`/post/${postId}/like/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Update like count
+                const countSpan = button.querySelector('.likes-count');
+                countSpan.textContent = data.likes_count;
+
+                // Toggle heart fill
+                const svg = button.querySelector('svg');
+                if (data.liked) {
+                    svg.setAttribute('fill', 'currentColor');
+                    button.classList.add('text-red-500');
+                } else {
+                    svg.setAttribute('fill', 'none');
+                    button.classList.remove('text-red-500');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        // Function to share post
+        function sharePost(postId) {
+            const postUrl = `${window.location.origin}/post/${postId}/`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Check out this post',
+                    url: postUrl
+                }).catch(err => console.log('Error sharing:', err));
+            } else {
+                // Fallback - copy to clipboard
+                navigator.clipboard.writeText(postUrl).then(() => {
+                    alert('Post link copied to clipboard!');
+                });
+            }
+        }
+    </script>
+{% endblock %}

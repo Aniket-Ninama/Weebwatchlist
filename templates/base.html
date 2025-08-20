@@ -1,0 +1,699 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WeebWatchlist - Anime Social Media</title>
+    <link rel="stylesheet" href="{% static 'theme/static/css/dist/styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    {% tailwind_css %}
+    <style>
+        @keyframes fadeIn {
+          0% { opacity: 0; transform: translateY(-10px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-out;
+        }
+        @media (max-width: 376px) and (min-width: 374px) {
+          .favorite-anime-empty {
+             height: 280px;
+          }
+
+          .favorite-anime-filled {
+            height: 520px; /* or whatever you want */
+          }
+        }
+        @media (max-width: 426px) and (min-width: 424px) {
+          .favorite-anime-empty {
+             height: 280px;
+          }
+
+          .favorite-anime-filled {
+            height: 580px; /* or whatever you want */
+          }
+        }
+        @media (max-width: 1025px) and (min-width: 1023px) {
+          .favorite-anime-filled {
+            height: 410px; /* or whatever you want */
+          }
+        }
+        @media (max-width: 376px) and (min-width: 374px) {
+          .user-info {
+            height: 305px; /* or whatever height you want */
+          }
+        }
+        @media (max-width: 426px) and (min-width: 424px) {
+          .user-info {
+            height: 270px; /* or whatever height you want */
+          }
+        }
+        @media (max-width: 426px) and (min-width: 374px) {
+          .statistics-anime {
+            height: 365px; /* or whatever height you want */
+          }
+        }
+
+        @media (max-width: 426px) and (min-width: 374px) {
+          .empty-state {
+            height: 175px; /* or whatever height you want */
+          }
+        }
+        @media (max-width: 640px) {
+        .hide-under-640 {
+          display: none !important;
+        }
+      }
+    </style>
+</head>
+<body class="bg-gray-950 text-white min-h-screen">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 shadow-lg" style="background-color: #0D1117;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo/Brand -->
+                <div class="flex-shrink-0">
+                    <h1 class="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                        WeebWatchlist
+                    </h1>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex space-x-8">
+                    <a href="{% url 'home' %}" class="text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+                        Home
+                    </a>
+                    <a href="{% url 'explore' %}" class="text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+                        Explore
+                    </a>
+                    <a href="{% url 'watchlist' %}" class="text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+                        Watchlist
+                    </a>
+                    <a href="{% url 'profile' %}" class="text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+                        Profile
+                    </a>
+                </nav>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button onclick="toggleMobileMenu()" class="text-gray-400 hover:text-white hover:bg-gray-700 p-2 rounded-md">
+                        <svg id="menu-icon" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <svg id="close-icon" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div id="mobile-menu" class="md:hidden hidden" style="background-color: #0D1117;">
+            <div class="px-2 pt-2 pb-3 space-y-1 border-t border-gray-700">
+                <a href="{% url 'home' %}" class="text-gray-300 hover:text-white hover:bg-gray-800 block px-3 py-2 rounded-md text-base font-medium">
+                    Home
+                </a>
+                <a href="{% url 'explore' %}" class="text-gray-300 hover:text-white hover:bg-gray-800 block px-3 py-2 rounded-md text-base font-medium">
+                    Explore
+                </a>
+                <a href="{% url 'watchlist' %}" class="text-gray-300 hover:text-white hover:bg-gray-800 block px-3 py-2 rounded-md text-base font-medium">
+                    Watchlist
+                </a>
+                <a href="{% url 'profile' %}" class="text-gray-300 hover:text-white hover:bg-gray-800 block px-3 py-2 rounded-md text-base font-medium">
+                    Profile
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+        {% block scripts %}{% endblock %}
+    </main>
+
+    <footer class="border-t border-gray-700" style="background-color: #0D1117;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <!-- Footer Content -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Brand Section -->
+                <div class="text-center md:text-left">
+                    <h3 class="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent mb-4">
+                        WeebWatchlist
+                    </h3>
+                    <p class="text-gray-400 text-sm">
+                        Your ultimate destination for tracking anime series and connecting with fellow otaku.
+                    </p>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="text-center">
+                    <h4 class="text-lg font-semibold text-white mb-4">Quick Links</h4>
+                    <div class="grid grid-cols-2 gap-2">
+                        <a href="#" class="text-gray-400 hover:text-white text-sm transition-colors duration-200">About</a>
+                        <a href="#" class="text-gray-400 hover:text-white text-sm transition-colors duration-200">Projects</a>
+                        <a href="#" class="text-gray-400 hover:text-white text-sm transition-colors duration-200">Contact</a>
+                        <a href="#" class="text-gray-400 hover:text-white text-sm transition-colors duration-200">Privacy Policy</a>
+                        <a href="#" class="text-gray-400 hover:text-white text-sm transition-colors duration-200">Terms</a>
+                    </div>
+                </div>
+
+                <!-- Social Links -->
+                <div class="text-center md:text-right">
+                    <h4 class="text-lg font-semibold text-white mb-4">Connect With Us</h4>
+                    <div class="flex justify-center md:justify-end space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="GitHub">
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.383.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="LinkedIn">
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="Twitter">
+                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200" aria-label="Email">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Divider -->
+            <div class="border-t border-gray-700 my-8"></div>
+
+            <!-- Copyright -->
+            <div class="text-center">
+                <p class="text-gray-400 text-sm">
+                    © 2025 WeebWatchlist. All rights reserved. Made with ❤️ for anime lovers worldwide.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const animeState = {};
+
+        function toggleFavorite(malId){
+            const fav_icon = document.getElementById('fav-icon');
+            fav_icon.classList.toggle('fill-pink-500');
+            fav_icon.classList.toggle('stroke-pink-500');
+            fetch('/toggle-favorite/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `mal_id=${malId}`
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.favorited) {
+                    // ✅ Optionally update Add Button to show tick mark
+                } else {
+                    // If un-favorited, you can leave add icon as is
+                }
+            })
+            .catch(err => {
+                // Revert UI if error
+                fav_icon.classList.toggle('fill-pink-500');
+                fav_icon.classList.toggle('stroke-pink-500');
+                alert("Error updating favorite status.");
+            });
+        }
+
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const menuIcon = document.getElementById('menu-icon');
+            const closeIcon = document.getElementById('close-icon');
+
+            mobileMenu.classList.toggle('hidden');
+            menuIcon.classList.toggle('hidden');
+            closeIcon.classList.toggle('hidden');
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const menuButton = event.target.closest('button');
+
+            if (!menuButton && !mobileMenu.contains(event.target) && !mobileMenu.classList.contains('hidden')) {
+                toggleMobileMenu();
+            }
+        });
+
+       // Toggle dropdown functionality
+        function toggleDropdown(dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            const allDropdowns = document.querySelectorAll('[id$="-dropdown"]');
+
+            // Close all other dropdowns
+            allDropdowns.forEach(d => {
+                if (d.id !== dropdownId) {
+                    d.classList.add('hidden');
+                }
+            });
+
+            // Toggle current dropdown
+            dropdown.classList.toggle('hidden');
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            const isDropdownButton = event.target.closest('button[onclick^="toggleDropdown"]');
+            const isDropdownContent = event.target.closest('[id$="-dropdown"]');
+
+            if (!isDropdownButton && !isDropdownContent) {
+                document.querySelectorAll('[id$="-dropdown"]').forEach(dropdown => {
+                    dropdown.classList.add('hidden');
+                });
+            }
+        });
+
+        // Clear all filters
+        function clearFilters() {
+            const form = document.getElementById('animesearch-form');
+            if (!form) return;
+
+            // Clear all input values
+            form.querySelectorAll('input').forEach(input => {
+                if (input.type === 'text') {
+                    input.value = '';
+                } else if (input.type === 'radio' || input.type === 'checkbox') {
+                    input.checked = false;
+                }
+            });
+
+            // Reset all dropdown label text to default (Genre, Year, etc.)
+            form.querySelectorAll('.dropdown-label').forEach(label => {
+                const defaultText = label.getAttribute('data-default');
+                if (defaultText) {
+                    label.textContent = defaultText;
+                }
+            });
+        }
+
+        // Update dropdown label and close on selection
+        document.addEventListener('DOMContentLoaded', function () {
+            const dropdowns = document.querySelectorAll('.dropdown');
+            dropdowns.forEach(dropdown => {
+                const radios = dropdown.querySelectorAll('input[type="radio"]');
+                radios.forEach(radio => {
+                    radio.addEventListener('change', function () {
+                        const selectedLabel = this.closest('label').innerText.trim();
+                        const dropdownId = dropdown.id;
+                        const baseId = dropdownId.replace('-dropdown', '');
+
+                        const button = document.querySelector(`button[onclick="toggleDropdown('${dropdownId}')"]`);
+                        if (button) {
+                            const span = button.querySelector('.dropdown-label');
+                            if (span) {
+                                span.textContent = selectedLabel;
+                            }
+                        }
+
+                        // ✅ Close the dropdown after selection
+                        dropdown.classList.add('hidden');
+                    });
+                });
+            });
+        });
+
+        function statusLabel(status) {
+            const labels = {
+                completed: "Completed",
+                watching: "Watching",
+                plan_to_watch: "Plan to Watch",
+                on_hold: "On Hold",
+                dropped: "Dropped",
+            };
+            return labels[status] || status;
+        }
+
+        function statusClasses(status) {
+            const classes = {
+                completed: "bg-green-900 text-green-200",
+                watching: "bg-blue-900 text-blue-200",
+                plan_to_watch: "bg-yellow-900 text-yellow-200",
+                on_hold: "bg-orange-900 text-orange-200",
+                dropped: "bg-red-900 text-red-200",
+            };
+            return classes[status] || "";
+        }
+
+        function statusIcon(status) {
+            switch (status) {
+                case 'completed': return '<i class="fas fa-check-circle mr-1"></i>Completed';
+                case 'watching': return '<i class="fas fa-play-circle mr-1"></i>Watching';
+                case 'plan_to_watch': return '<i class="fas fa-clock mr-1"></i>Plan to Watch';
+                case 'on_hold': return '<i class="fas fa-pause-circle mr-1"></i>On Hold';
+                case 'dropped': return '<i class="fas fa-times-circle mr-1"></i>Dropped';
+                default: return '';
+            }
+        }
+
+
+        function showSuccessMessage(text, is_update, title) {
+            const notification = document.getElementById('watchlistNotification');
+            const heading = document.getElementById('notification-heading');
+            const message = document.getElementById('watchlistMessage');
+            heading.classList.remove('text-green-500', 'text-cyan-500', 'text-red-500');
+            message.classList.remove('text-green-500', 'text-cyan-500', 'text-red-500');
+            if (is_update === false){
+                heading.textContent = `Added to Watchlist`;
+                message.textContent = `${title} has been added to your watchlist.`;
+                heading.classList.add('text-green-500');
+                message.classList.add('text-green-500');
+            }
+            else if (is_update === true){
+                heading.textContent = `Update Successfull`;
+                message.textContent = `${text}`;
+                heading.classList.add('text-cyan-500');
+                message.classList.add('text-cyan-500');
+            }
+            else{
+                heading.textContent = `Oops, Something Went Wrong!`;
+                message.textContent = `${text}`;
+                heading.classList.add('text-red-500');
+                message.classList.add('text-red-500');
+            }
+
+            notification.classList.remove('hidden');
+            notification.classList.add('animate-fadeIn');
+
+            setTimeout(() => {
+              notification.classList.add('hidden');
+            }, 3000); // Hide after 3 seconds
+        }
+
+        function resetAnimeForm() {
+            document.getElementById('anime-form').reset();  // Clear all fields
+            document.getElementById('anime_mal_id').value = ''; // Clear hidden mal_id
+            document.getElementById('cancel-btn').classList.toggle('hidden');
+            document.getElementById('submit-btn').textContent = 'Add to Watchlist';
+            document.getElementById('anime_title').readOnly = false;
+        }
+
+
+        async function submitAnimeForm(event) {
+            event.preventDefault();
+
+            const malId = document.getElementById('anime_mal_id').value;
+            const title = document.getElementById('anime_title').value;
+            const status = document.getElementById('watch_status').value;
+            const rating = document.getElementById('rating').value;
+            const csrfToken = document.querySelector('input[name=csrfmiddlewaretoken1]').value;
+            const card = document.querySelector(`.anime-card[data-mal-id="${malId}"]`);
+            let is_exist = false;
+            // Update anime card
+            if (card && malId){
+                is_exist = true;
+                const ratingBadge = card.querySelector('.rating-badge');
+                if (ratingBadge){
+                    ratingBadge.innerHTML = `<i class="fas fa-star mr-1"></i>${rating}`;
+                }
+                const statusSpan = card.querySelector('.status-badge');
+                if (statusSpan){
+                    statusSpan.innerHTML = statusLabel(status)
+                     statusSpan.className = `inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusClasses(status)} status-badge`;
+                }
+            }
+            const payload = {
+                mal_id: malId,
+                title,
+                status,
+                rating,
+                is_exist
+            };
+
+            const response = await fetch('/anime/add-or-update/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                showSuccessMessage(data.is_update ? "Anime updated successfully!" : " ", data.is_update, data.title);
+                resetAnimeForm();
+                if (!card) {
+                    const animeList = document.getElementById('animeList');
+                    const newCard = document.createElement('div');
+                    newCard.className = `anime-card group rounded-xl overflow-hidden shadow-md hover:shadow-xl hover:scale-105 transform transition-all duration-300 border-2 border-transparent`;
+                    newCard.setAttribute('data-mal-id', data.mal_id);
+                    newCard.style.backgroundColor = "#0f1419";
+
+                    newCard.innerHTML = `
+                        <!-- Poster Image -->
+                        <div class="relative aspect-[3/4]" onclick="goToAnimeDetails(${data.mal_id})"
+                             style="background: linear-gradient(135deg, #2d3748, #4a5568);">
+                            ${data.image_url ? `
+                                <img src="${data.image_url}" alt="${data.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                            ` : `
+                                <div class="w-full h-full flex items-center justify-center">
+                                    <i class="fas fa-image text-4xl text-gray-400"></i>
+                                </div>
+                            `}
+                            ${data.rating ? `
+                                <div class="rating-badge absolute top-2 right-2 text-yellow-400 px-2 py-1 rounded-full text-xs shadow-lg">
+                                    <i class="fas fa-star mr-1"></i>${data.rating}
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        <!-- Card Content -->
+                        <div class="p-4 space-y-3">
+                            <h3 class="font-semibold text-white line-clamp-2 group-hover:text-blue-400 transition-colors">
+                                ${data.title}
+                            </h3>
+
+                            <!-- Status Label -->
+                            <div class="flex items-center">
+                                <span class="status-badge inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusClasses(data.status)}">
+                                    ${statusIcon(data.status)}
+                                </span>
+                            </div>
+
+                            <!-- Date Added -->
+                            <p class="text-xs text-gray-400 flex items-center">
+                                <i class="fas fa-calendar-plus mr-1"></i>
+                                Added: ${data.date}
+                            </p>
+
+                            <!-- Action Buttons -->
+                            <div class="opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-200 flex space-x-2 pt-2">
+                                <button class="edit-anime-btn flex-1 px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-md transition-colors duration-200"
+                                        onclick="scrollAndFocusInput(this)"
+                                        data-title="${data.title}"
+                                        data-status="${data.status}"
+                                        data-rating="${data.rating}"
+                                        data-id="${data.mal_id}">
+                                    <i class="fas fa-edit mr-1"></i>Edit
+                                </button>
+                                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                                <button class="delete-anime-btn px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-xs rounded-md transition-colors duration-200"
+                                        data-anime-id="${data.mal_id}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+
+                    animeList.prepend(newCard);
+                }
+            }
+            else if (!data.success){
+                showSuccessMessage(data.message || data.error, null, data.title);
+            }
+
+        }
+
+        function scrollAndFocusInput(button) {
+            const animeTitle = button.dataset.title;
+            const animeStatus = button.dataset.status;
+            const animeRating = button.dataset.rating;
+            const animeId = button.dataset.id;
+
+            document.querySelector('input[name="anime_title"]').value = animeTitle || '';
+            document.querySelector('select[name="watch_status"]').value = animeStatus || '';
+            document.querySelector('input[name="rating"]').value = animeRating || '';
+            document.querySelector('input[name="anime_mal_id"]').value = animeId || '';
+
+            document.getElementById('anime_title').readOnly = true;
+            const cancel = document.getElementById('cancel-btn');
+            cancel.classList.remove('hidden');
+
+
+            document.getElementById('submit-btn').textContent = 'Update Anime';
+            const form = document.getElementById('anime-form');
+            form.scrollIntoView({ behavior: 'smooth', block: 'end' });
+
+            // Optional: highlight title input after scroll
+            setTimeout(() => {
+                document.querySelector('select[name="watch_status"]').focus();
+            }, 500);
+        }
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll('.delete-anime-btn').forEach(button => {
+                button.addEventListener('click', async function(e) {
+                    e.preventDefault();
+                    const animeId = this.getAttribute('data-anime-id');
+
+                    const response = await fetch(`/delete-anime/${animeId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': document.querySelector('input[name=csrfmiddlewaretoken]').value,
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({})
+                    });
+
+                    if (response.ok) {
+                        const card = this.closest('.anime-card');
+                        if (card) card.remove();
+                        const remaining = document.querySelectorAll('.anime-card').length;
+                        document.getElementById('anime-count').textContent = remaining;
+
+                        if (remaining === 0) {
+                            document.getElementById('empty-state').classList.remove('hidden');
+                        }
+                    } else {
+                        alert("Failed to delete anime.");
+                    }
+                });
+            });
+        });
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (const cookie of cookies) {
+                    const trimmed = cookie.trim();
+                    if (trimmed.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(trimmed.slice(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        window.addToWatchlist = function(malId, event) {
+            const addBtn = document.getElementById(`add-btn-${malId}`);
+            const addIcon = document.getElementById(`add-icon-${malId}`);
+            event.preventDefault()
+            event.stopPropagation()
+
+            // Instantly change icon to checkmark
+            addIcon.setAttribute('d', 'M5 13l4 4L19 7'); // Checkmark path
+            addIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>';
+            addBtn.classList.remove('text-white');
+            addBtn.classList.add('text-green-500'); // Change color
+
+            // Send request in background
+            fetch('/add-to-watchlist/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `mal_id=${malId}`
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.message && data.message.includes("Already added")) {
+                    console.log("Anime already in watchlist");
+                }
+            })
+            .catch(err => {
+                // Revert icon if error
+                addIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>';
+                addBtn.classList.remove('text-green-400');
+                alert("Failed to add to watchlist.");
+            });
+        }
+
+        window.toggle_favorite = function(malId, event) {
+            event.stopPropagation()
+            event.preventDefault()
+            const heartBtn = document.getElementById(`fav-btn-${malId}`);
+            const heartIcon = document.getElementById(`fav-icon-${malId}`);
+            const addIcon = document.getElementById(`add-icon-${malId}`);
+            const addBtn = document.getElementById(`add-btn-${malId}`);
+
+            addIcon.setAttribute('d', 'M5 13l4 4L19 7'); // Checkmark path
+            addIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>';
+            addBtn.classList.remove('text-white');
+            addBtn.classList.add('text-green-500');
+
+            // Instant UI change (toggle pink fill)
+            const isNowFavorite = heartIcon.classList.toggle('fill-pink-500');
+            heartIcon.classList.toggle('stroke-pink-500');
+
+            // Update your own custom JS state (optional)
+            animeState[malId] = animeState[malId] || {};
+            animeState[malId].is_favorite = isNowFavorite;
+
+
+            fetch('/toggle-favorite/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `mal_id=${malId}`
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.favorited) {
+                    // ✅ Optionally update Add Button to show tick mark
+                } else {
+                    // If un-favorited, you can leave add icon as is
+                }
+            })
+            .catch(err => {
+                // Revert UI if error
+                heartIcon.classList.toggle('fill-pink-500');
+                heartIcon.classList.toggle('stroke-pink-500');
+                heartIcon.classList.toggle('stroke-white');
+                addIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>';
+                addBtn.classList.add('text-white');
+                alert("Error updating favorite status.");
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const flashMessages = document.getElementById("flash-messages");
+            if (flashMessages) {
+              setTimeout(() => {
+                flashMessages.style.transition = "opacity 0.5s ease-out";
+                flashMessages.style.opacity = "0";
+                setTimeout(() => flashMessages.remove(), 500); // Fully remove after fade
+              }, 4000); // Show for 4 seconds
+            }
+          });
+
+        window.goToAnimeDetails = function(malId) {
+            window.location.href = `/anime/${malId}/`;
+        }
+
+    </script>
+</body>
+</html>

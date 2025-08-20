@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+/**
+  * A catch-all path to Django template files, JavaScript, and Python files
+  * that contain Tailwind CSS classes and will be scanned by Tailwind to generate the final CSS file.
+  *
+  * If your final CSS file is not being updated after code changes, you may want to broaden or narrow
+  * the scope of this path.
+  */
+@source "../../../**/*.{html,py,js}";
+/* Remove number input spinners */
+.no-spinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.no-spinner::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.no-spinner {
+  -moz-appearance: textfield;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;     /* Firefox */
+}
+
+.scrollbar-custom {
+  scrollbar-width: thin;                        /* Firefox */
+  scrollbar-color: #4b5563 transparent;         /* thumb | track */
+}
+
+.scrollbar-custom::-webkit-scrollbar {
+  height: 6px;                                   /* Horizontal scrollbar height */
+}
+
+.scrollbar-custom::-webkit-scrollbar-track {
+  background: transparent;                       /* transparent track */
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background-color: #4b5563;                     /* Tailwind gray-600 */
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb:hover {
+  background-color: #6b7280;                     /* Tailwind gray-500 on hover */
+}
+.mention {
+    color: #ec4899; /* Tailwind pink-500 */
+    font-weight: 600;
+}

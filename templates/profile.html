@@ -1,0 +1,459 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<div class="max-w-6xl mx-auto p-4 space-y-6">
+    {% if messages %}
+            {% for message in messages %}
+                <div class="mb-6 p-4 rounded-lg border {% if message.tags == 'error' %}bg-red-900 border-red-700 text-red-200{% elif message.tags == 'success' %}bg-green-900 border-green-700 text-green-200{% else %}bg-blue-900 border-blue-700 text-blue-200{% endif %}" id="flash-messages">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        <!-- Cover Image and Profile Picture Section -->
+        <div class="relative">
+            <!-- Cover Image -->
+            <div class="h-48 sm:h-64 w-full rounded-xl overflow-hidden bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600">
+                {% if user_profile.cover_image %}
+                            <img src="{{ user_profile.cover_image.url }}"
+                                 alt="Cover"
+                                 class="absolute inset-0 w-full h-full object-cover object-center rounded-xl" />
+                {% endif %}
+            </div>
+
+            <!-- Profile Picture -->
+            <div class="absolute -bottom-12 left-6">
+                <div class="relative">
+                    <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-dark-800 bg-dark-700 overflow-hidden shadow-2xl">
+                        {% if user_profile.profile_picture %}
+                            <img src="{{ user_profile.profile_picture.url }}" alt="{{ user.username }}" class="w-full h-full object-cover">
+                        {% else %}
+                            <div class="w-full h-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                                <i class="fas fa-user text-white text-2xl sm:text-3xl"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <!-- Online status indicator -->
+                    <div class="absolute bottom-1 right-1 w-4 h-4 sm:w-6 sm:h-6 bg-green-500 rounded-full border-2 border-dark-800"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Info Section -->
+        <div class="user-info pt-6 px-6 space-y-4 bg-gray-900 border border-gray-700 rounded-lg h-[330px] md:h-[220px] lg:h-[225px]">
+            <!-- Username and Handle -->
+            <div class="space-y-1">
+                <h1 class="text-2xl sm:text-3xl font-bold text-white">
+                    {{ user.first_name }}
+                </h1>
+                <p class="text-dark-400 text-lg">@{{ user.username }}</p>
+            </div>
+
+            <!-- Bio -->
+            <div class="max-w-2xl">
+                <p class="text-dark-200 leading-relaxed">
+                    {{ user_profile.bio | default:"Anime enthusiast exploring new worlds one episode at a time ✨🌸 Currently watching the latest seasonal anime! 📺" }}
+                </p>
+            </div>
+
+            <!-- Profile Details -->
+            <div class="flex flex-wrap gap-4 text-sm text-dark-300">
+                {% if user_profile.location %}
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-map-marker-alt text-red-400"></i>
+                    <span>{{ user_profile.location }}</span>
+                </div>
+                {% endif %}
+
+                {% if user.email and user_profile.show_email %}
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-envelope text-blue-400"></i>
+                    <span>{{ user.email }}</span>
+                </div>
+                {% endif %}
+
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-calendar-alt text-green-400"></i>
+                    <span>Joined {{ user.date_joined|date:"F j, Y" }}</span>
+                </div>
+
+                <div class="ml-auto">
+                    <button id="editProfileBtn"
+                       class="h-[25px] inline-flex items-center gap-2 px-4 py-2 text-sm text-white bg-gray-800 hover:bg-gray-700 border border-gray-500 rounded-sm shadow transition">
+                        <i class="fas fa-user-edit"></i>
+                        Edit
+                    </button>
+                </div>
+            </div>
+
+             <div id="modalOverlay"
+                     class="fixed inset-0 bg-black bg-opacity-50 modal-overlay hidden items-center justify-center z-50 p-4"
+                     style="display: none;">
+
+                    <!-- Modal Content -->
+                    <div id="modalContent"
+                         class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto scrollbar-custom">
+
+                        <!-- Modal Header -->
+                        <div class="sticky top-0 bg-white dark:bg-gray-800 px-6 py-4 border-b border-gray-200 dark:border-gray-700 rounded-t-xl z-20">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Edit Profile</h3>
+                                <button id="closeModal"
+                                        class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 rounded-lg p-1">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Modal Body -->
+                        <form id="editProfileForm" class="pr-6 pb-6 pl-6 pt-0 space-y-6" action="{% url 'edit-profile' %}" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <!-- Profile Picture Section - Fixed at top -->
+                            <div class="sticky top-[65px] bg-white dark:bg-gray-800 px-6 py-4 border-b border-gray-200 dark:border-gray-700 z-10">
+                                <div class="flex items-center justify-center mb-4">
+                                    <div class="relative">
+                                        <img id="profilePreview"
+                                             src="{{ user_profile.profile_picture.url }}"
+                                             alt="Profile Preview"
+                                             class="w-24 h-24 rounded-full object-cover border-4 border-gray-200 dark:border-gray-600">
+                                        <div class="absolute inset-0 rounded-full bg-black bg-opacity-40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-200 cursor-pointer"
+                                             onclick="document.getElementById('profilePictureInput').click()">
+                                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                      d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                      d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <!-- 🟢 Profile Picture File Input Now Inside Form -->
+                                    <input type="file"
+                                           id="profilePictureInput"
+                                           name="profile_picture"
+                                           accept="image/*"
+                                           class="hidden">
+                                    <button type="button"
+                                            onclick="document.getElementById('profilePictureInput').click()"
+                                            class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        Choose Photo
+                                    </button>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">JPG, PNG or GIF. Max size 2MB.</p>
+                                </div>
+                            </div>
+
+                            <!-- Name Field -->
+                            <div>
+                                <label for="displayName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Name
+                                </label>
+                                <input type="text"
+                                       id="displayName"
+                                       name="display_name"
+                                       value="{{ user.first_name }}"
+                                       placeholder="Enter your display name"
+                                       class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400">
+                            </div>
+
+                            <!-- Username Field -->
+                            <div>
+                                <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Username
+                                </label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-2 text-gray-500 dark:text-gray-400">@</span>
+                                    <input type="text"
+                                           id="username"
+                                           name="username"
+                                           value="{{ user.username }}"
+                                           placeholder="username"
+                                           class="w-full pl-8 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400">
+                                </div>
+                                <small id="feedback" class="text-sm mt-1 hidden"></small>
+                            </div>
+
+                            <!-- Location Field -->
+                            <div>
+                                <label for="location" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Location
+                                </label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-2 text-gray-500 dark:text-gray-400">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    </span>
+                                    <input type="text"
+                                           id="location"
+                                           name="location"
+                                           value="{{ user_profile.location }}"
+                                           placeholder="City, State/Country"
+                                           class="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400">
+                                </div>
+                            </div>
+
+                            <!-- Bio Field -->
+                            <div>
+                                <label for="bio" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Bio
+                                </label>
+                                <textarea id="bio"
+                                          name="bio"
+                                          rows="4"
+                                          placeholder="Tell us about yourself..."
+                                          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 resize-none">{{ user_profile.bio }}</textarea>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Maximum 500 characters</p>
+                            </div>
+
+<!--                            &lt;!&ndash; Email Field &ndash;&gt;-->
+<!--                            <div>-->
+<!--                                <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">-->
+<!--                                    Email Address-->
+<!--                                </label>-->
+<!--                                <input type="email"-->
+<!--                                       id="email"-->
+<!--                                       name="email"-->
+<!--                                       value="{{ user.email }}"-->
+<!--                                       class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400">-->
+<!--                            </div>-->
+
+                            <!-- Show Email Publicly Checkbox -->
+                            <div class="flex items-center space-x-3">
+                                <input type="checkbox"
+                                       id="showEmail"
+                                       name="show_email"
+                                       {% if user_profile.show_email %}checked{% endif %}
+                                       class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                <label for="showEmail" class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Show email address publicly
+                                </label>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+                                <button type="button"
+                                        id="cancelBtn"
+                                        class="px-6 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                                    Cancel
+                                </button>
+                                <button type="submit"
+                                        class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800">
+                                    Save Changes
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+        </div>
+
+        <!-- Statistics Section -->
+        <div class="statistics-anime px-6 bg-gray-900 border border-gray-700 rounded-lg h-[375px] md:h-[260px] lg:h-[155px]">
+            <h2 class="text-xl font-semibold mb-4 text-white pl-[5px] pt-[5px]">Statistics</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <!-- Total Anime -->
+                <div class="bg-dark-800 rounded-lg p-4 text-center border border-gray-500 hover:border-purple-500 transition-colors">
+                    <div class="text-2xl font-bold text-purple-400 mb-1">
+                        {{ length_of_watchlist | default:0 }}
+                    </div>
+                    <div class="text-xs text-dark-300 uppercase tracking-wide">Total Anime</div>
+                </div>
+
+                <!-- Completed -->
+                <div class="bg-dark-800 rounded-lg p-4 text-center border border-gray-500 hover:border-green-500 transition-colors">
+                    <div class="text-2xl font-bold text-green-400 mb-1">
+                        {{ completed_animes | default:0 }}
+                    </div>
+                    <div class="text-xs text-dark-300 uppercase tracking-wide">Completed</div>
+                </div>
+
+                <!-- Watching -->
+                <div class="bg-dark-800 rounded-lg p-4 text-center border border-gray-500 hover:border-blue-500 transition-colors">
+                    <div class="text-2xl font-bold text-blue-400 mb-1">
+                        {{ watching_animes | default:0 }}
+                    </div>
+                    <div class="text-xs text-dark-300 uppercase tracking-wide">Watching</div>
+                </div>
+
+                <!-- Plan to Watch -->
+                <div class="bg-dark-800 rounded-lg p-4 text-center border border-gray-500 hover:border-yellow-500 transition-colors">
+                    <div class="text-2xl font-bold text-yellow-400 mb-1">
+                        {{ plan_to_watch_animes | default:0 }}
+                    </div>
+                    <div class="text-xs text-dark-300 uppercase tracking-wide">Plan to Watch</div>
+                </div>
+
+                <!-- Dropped -->
+                <div class="bg-dark-800 rounded-lg p-4 text-center border border-gray-500 hover:border-red-500 transition-colors">
+                    <div class="text-2xl font-bold text-red-400 mb-1">
+                        {{ dropped_animes | default:0 }}
+                    </div>
+                    <div class="text-xs text-dark-300 uppercase tracking-wide">Dropped</div>
+                </div>
+
+                <!-- Episodes Watched -->
+                <div class="bg-dark-800 rounded-lg p-4 text-center border border-gray-500 hover:border-pink-500 transition-colors">
+                    <div class="text-2xl font-bold text-pink-400 mb-1">
+                        {{ total_episodes | default:0 }}
+                    </div>
+                    <div class="text-xs text-dark-300 uppercase tracking-wide">Episodes</div>
+                </div>
+            </div>
+        </div>
+
+            <div class="px-6 bg-gray-900 border border-gray-700 rounded-lg {% if favorite_anime %}
+                favorite-anime-filled
+                h-[440px] md:h-[330px] lg:h-[460px]
+            {% else %}
+                favorite-anime-empty
+                h-[330px] md:h-[265px] lg:h-[260px]
+            {% endif %}">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-semibold text-white pl-[5px] pt-[5px]">Favorite Anime</h2>
+            </div>
+            {% if favorite_anime %}
+                <!-- Anime Grid -->
+                <div class="anime-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 overflow-y-auto pr-2 scrollbar-custom p-2 rounded-lg" style="max-height: calc(100% - 4rem);">
+                {% for anime in favorite_anime %}
+                <div class="group cursor-pointer">
+                    <div class="bg-dark-800 rounded-lg overflow-hidden border border-dark-500 transition-all duration-300 group-hover:scale-103 group-hover:shadow-xl  h-full">
+                        <!-- Anime Poster -->
+                        <div class="aspect-[3/4] bg-dark-700 relative overflow-hidden">
+                            <img src="{{ anime.image_url }}"
+                                 alt="{{ anime.title }}"
+                                 class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
+                        </div>
+                        <!-- Anime Title -->
+                        <div class="p-2 flex-1">
+                            <h3 class="text-sm font-medium text-white truncate">{{ anime.title }}</h3>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <!-- Empty State -->
+            <div class="empty-state bg-dark-800 rounded-lg border border-gray-700 p-8 text-center h-[225px] md:h-[155px]">
+                <div class="text-dark-400 mb-4">
+                    <i class="fas fa-heart text-4xl mb-3"></i>
+                    <p class="text-lg font-medium mb-2">No favorite anime yet</p>
+                    <p class="text-sm text-dark-500">Add some anime to your favorites to showcase them here!</p>
+                </div>
+                {% if user == request.user %}
+                <button class="mt-4 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors" onclick="window.location.href='{% url 'explore' %}'">
+                    <i class="fas fa-plus mr-2"></i>Add Favorites
+                </button>
+                {% endif %}
+            </div>
+            {% endif %}
+            </div>
+
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="w-full h-10 bg-red-800 text-xl text-white flex items-center justify-center rounded-lg px-4
+        hover:bg-red-700 hover:scale-105 hover:shadow-md transition-all duration-200 ease-in-out cursor-pointer">
+                <span class="w-full text-center cursor-pointer">Logout</span>
+            </button>
+        </form>
+
+    </div>
+{% endblock %}
+{% block scripts %}
+<script>
+     // Modal functionality
+        const editProfileBtn = document.getElementById('editProfileBtn');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalContent = document.getElementById('modalContent');
+        const closeModal = document.getElementById('closeModal');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const profilePictureInput = document.getElementById('profilePictureInput');
+        const profilePreview = document.getElementById('profilePreview');
+
+        // Show modal
+        function showModal() {
+            modalOverlay.style.display = 'flex';
+            modalOverlay.classList.remove('hidden');
+            modalOverlay.classList.add('animate-fade-in');
+            modalContent.classList.add('animate-slide-up');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Hide modal
+        function hideModal() {
+            modalOverlay.classList.remove('animate-fade-in');
+            modalContent.classList.remove('animate-slide-up');
+            setTimeout(() => {
+                modalOverlay.style.display = 'none';
+                modalOverlay.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
+        // Event listeners
+        editProfileBtn.addEventListener('click', showModal);
+        closeModal.addEventListener('click', hideModal);
+        cancelBtn.addEventListener('click', hideModal);
+
+        // Close modal when clicking outside
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                hideModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !modalOverlay.classList.contains('hidden')) {
+                hideModal();
+            }
+        });
+
+        // Profile picture preview
+        profilePictureInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    profilePreview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+        const usernameInput = document.getElementById("username");
+        const feedback = document.getElementById("feedback");
+
+        usernameInput.addEventListener("input", () => {
+            const username = usernameInput.value.trim();
+
+            if (username === '') {
+                feedback.textContent = "";
+                feedback.className = "hidden";
+                return;
+            }
+
+            feedback.classList.remove("hidden");
+
+            fetch(`check-username/?username=${username}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.available) {
+                        feedback.textContent = "Username is available ✔";
+                        feedback.className = "text-sm mt-1 text-green-500";
+                    } else {
+                        feedback.textContent = "Username is already taken ❌";
+                        feedback.className = "text-sm mt-1 text-red-500";
+                    }
+                })
+                .catch(err => {
+                    feedback.textContent = "Error checking username.";
+                    feedback.className = "text-sm mt-1 text-red-500";
+                });
+            });
+        });
+
+</script>
+{% endblock %}

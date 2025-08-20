@@ -1,0 +1,261 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - WeebWatchlist</title>
+    {% tailwind_css %}
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-text {
+            background: linear-gradient(135deg, #9333ea, #e91e63);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-md fade-in">
+        <!-- Logo/Brand Section -->
+        <div class="text-center mb-8">
+            <div class="inline-block p-4 bg-gradient-to-br from-purple-600 to-pink-600 animate-float rounded-full mb-4">
+                <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+            </div>
+            <h1 class="text-3xl font-bold gradient-text mb-2">WeebWatchlist</h1>
+            <p class="text-gray-400">Join the anime community</p>
+        </div>
+
+        <!-- Messages Section -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="mb-6 p-4 rounded-lg border {% if message.tags == 'error' %}bg-red-900 border-red-700 text-red-200{% elif message.tags == 'success' %}bg-green-900 border-green-700 text-green-200{% else %}bg-blue-900 border-blue-700 text-blue-200{% endif %}" id="flash-messages">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Registration Form -->
+        <div class="bg-gray-800 rounded-lg shadow-2xl p-8 border border-gray-700">
+            <h2 class="text-2xl font-bold text-white text-center mb-6">Create Account</h2>
+
+            <form method="post" class="space-y-6" NOVALIDATE>
+                {% csrf_token %}
+
+                <!-- Username Field -->
+                <div>
+                    <label for="username" class="block text-sm font-medium text-gray-300 mb-2">
+                        Username
+                    </label>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        required
+                        class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 hover:border-gray-500"
+                        placeholder="Enter your username"
+                    >
+                    <small id="feedback" class="text-sm mt-1 hidden"></small>
+                </div>
+
+                <!-- Email Field -->
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-300 mb-2">
+                        Email
+                    </label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        required
+                        class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 hover:border-gray-500"
+                        placeholder="Enter your email"
+                    >
+                    <small id="email-feedback" class="hidden text-sm mt-1"></small>
+                </div>
+
+                <!-- Password Field -->
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-300 mb-2">
+                        Password
+                    </label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        required
+                        class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 hover:border-gray-500"
+                        placeholder="Enter your password"
+                    >
+                    <small id="password-feedback" class="hidden text-sm mt-1"></small>
+                </div>
+
+                <!-- Confirm Password Field -->
+                <div>
+                    <label for="confirm_password" class="block text-sm font-medium text-gray-300 mb-2">
+                        Confirm Password
+                    </label>
+                    <input
+                        type="password"
+                        id="confirm_password"
+                        name="confirm_password"
+                        required
+                        class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 hover:border-gray-500"
+                        placeholder="Confirm your password"
+                    >
+                </div>
+
+                <!-- Sign Up Button -->
+                <button
+                    type="submit"
+                    class="w-full py-3 px-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg shadow-lg hover:from-purple-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-800 transform transition-all duration-200 hover:scale-105 active:scale-95"
+                >
+                    Sign Up
+                </button>
+            </form>
+
+            <!-- Login Link -->
+            <div class="mt-6 text-center">
+                <p class="text-gray-400">
+                    Already have an account?
+                    <a href="{% url 'login' %}" class="text-purple-400 hover:text-purple-300 font-medium transition-colors duration-200">
+                        Login
+                    </a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-8">
+            <p class="text-gray-500 text-sm">
+                &copy; 2025 WeebWatchlist. Track your anime journey.
+            </p>
+        </div>
+    </div>
+
+
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+    const usernameInput = document.getElementById("username");
+    const feedback = document.getElementById("feedback");
+
+    usernameInput.addEventListener("input", () => {
+        const username = usernameInput.value.trim();
+
+        if (username === '') {
+            feedback.textContent = "";
+            feedback.className = "hidden";
+            return;
+        }
+
+        feedback.classList.remove("hidden");
+
+        fetch(`check-username/?username=${username}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.available) {
+                    feedback.textContent = "Username is available ✔";
+                    feedback.className = "text-sm mt-1 text-green-500";
+                } else {
+                    feedback.textContent = "Username is already taken ❌";
+                    feedback.className = "text-sm mt-1 text-red-500";
+                }
+            })
+            .catch(err => {
+                feedback.textContent = "Error checking username.";
+                feedback.className = "text-sm mt-1 text-red-500";
+            });
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const emailInput = document.getElementById("email");
+        const emailFeedback = document.getElementById("email-feedback");
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        emailInput.addEventListener("input", () => {
+            const email = emailInput.value.trim();
+
+            if (email === '') {
+                emailFeedback.textContent = "";
+                emailFeedback.classList.add("hidden");
+                return;
+            }
+
+            emailFeedback.classList.remove("hidden");
+
+            if (!emailRegex.test(email)) {
+                emailFeedback.textContent = "Invalid email format ❌";
+                emailFeedback.className = "text-sm mt-1 text-red-500";
+            } else {
+                emailFeedback.textContent = "Valid email ✔";
+                emailFeedback.className = "text-sm mt-1 text-green-500";
+            }
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", () =>{
+        const passwordInput = document.getElementById("password");
+        const pass_feedback = document.getElementById('password-feedback');
+        passwordInput.addEventListener("input", () =>{
+            const password = passwordInput.value.trim();
+
+            if (password === ''){
+                pass_feedback.textContent = '';
+                pass_feedback.classList.add('hidden')
+                return;
+            }
+
+            pass_feedback.classList.remove('hidden')
+
+            const lengthValid = password.length >= 8;
+            const hasNumber = /[0-9]/.test(password);
+            const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+            if (lengthValid && hasNumber && hasSpecialChar) {
+            pass_feedback.textContent = "Strong password ✔";
+            pass_feedback.className = "text-sm mt-1 text-green-500";
+            } else {
+                pass_feedback.textContent = "Password must be at least 8 characters, include 1 number and 1 special character ❌";
+                pass_feedback.className = "text-sm mt-1 text-red-500";
+            }
+
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const flashMessages = document.getElementById("flash-messages");
+        if (flashMessages) {
+          setTimeout(() => {
+            flashMessages.style.transition = "opacity 0.5s ease-out";
+            flashMessages.style.opacity = "0";
+            setTimeout(() => flashMessages.remove(), 500); // Fully remove after fade
+          }, 4000); // Show for 4 seconds
+        }
+      });
+
+    </script>
+</body>
+</html>
