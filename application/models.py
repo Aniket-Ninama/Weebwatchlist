@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.templatetags.static import static
 # Create your models here.
 
 class AllPosts(models.Model):
@@ -11,12 +12,12 @@ class AllPosts(models.Model):
 
     @property
     def avatar_url(self):
-        """Return the user's profile picture or default static path."""
         profile = getattr(self.user, "userprofile", None)
         if profile and profile.profile_picture:
             return profile.profile_picture.url
-        from django.conf import settings
-        return settings.MEDIA_URL + 'profile_pics/img.png'
+        # Fallback to static default
+        return static('images/profile_pics/img.png')
+
     def __str__(self):
         return f"{self.user.username} - {self.created_at.strftime('%Y-%m-%d %H:%M')}"
 
@@ -36,13 +37,11 @@ class Comment(models.Model):
 
     @property
     def avatar_url(self):
-        # Try to get from user profile first
         profile = getattr(self.user, "userprofile", None)
         if profile and profile.profile_picture:
             return profile.profile_picture.url
-        # Return default media file
-        from django.conf import settings
-        return settings.MEDIA_URL + 'profile_pics/img.png'
+        # Fallback to static default
+        return static('images/profile_pics/img.png')
 
     def __str__(self):
         return f"Comment by {self.user.username} on {self.post}"
@@ -93,8 +92,20 @@ class Watchlist(models.Model):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    profile_picture = models.ImageField(upload_to='profile_pics/', default='profile_pics/img.png')
-    cover_image = models.ImageField(upload_to='cover_pics/', default='cover_pics/cover_page.jpg')
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    cover_image = models.ImageField(upload_to='cover_pics/', blank=True, null=True)
     bio = models.TextField(blank=True)
     location = models.TextField(blank=True)
     show_email = models.BooleanField(default=False)
+
+    @property
+    def profile_picture_url(self):
+        if self.profile_picture:
+            return self.profile_picture.url
+        return static('images/profile_pics/img.png')
+
+    @property
+    def cover_image_url(self):
+        if self.cover_image:
+            return self.cover_image.url
+        return static('images/cover_pics/cover_page.jpg')
