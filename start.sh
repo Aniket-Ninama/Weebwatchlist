@@ -1,5 +1,6 @@
 #!/bin/bash
 # Run migrations
+python manage.py makemigrations --noinput
 python manage.py migrate
 
 # Collect static files (outside Python block!)
