@@ -29,17 +29,13 @@ def index(request):
         )
 
         user_profile, created = UserProfile.objects.get_or_create(user=request.user)
-        user_img = user_profile.profile_picture
         user_name = request.user
-    else:
-        user_img = None
-        user_name = None
 
 
     return render(request, 'home.html', {
         'posts': posts,
         'has_more_posts': False,
-        'user_img': user_img,
+        'user_img': user_profile,
         'user_name': user_name,
     })
 
