@@ -621,7 +621,7 @@ def post_detail(request, post_id):
         try:
             profile = UserProfile.objects.get(user=request.user)  # fetch from DB
             if profile.profile_picture:
-                user_img = profile.profile_picture.url  # actual image URL from DB
+                user_img = profile.profile_picture  # actual image URL from DB
         except UserProfile.DoesNotExist:
             user_img = None  # no profile found
 
