@@ -20,10 +20,8 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 # Add manually
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [
-    BASE_DIR / "theme" / "static_src",  # for Tailwind source files
-]
+STATICFILES_DIRS = [BASE_DIR / "static"]   # points to your "static" folder
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -140,5 +138,5 @@ USE_TZ = True
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = BASE_DIR / "media"
 TIME_ZONE = 'Asia/Kolkata'

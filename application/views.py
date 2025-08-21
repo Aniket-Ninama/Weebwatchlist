@@ -30,6 +30,9 @@ def index(request):
 
         user_profile, created = UserProfile.objects.get_or_create(user=request.user)
         user_name = request.user
+    else:
+        user_name = None
+        user_profile = None
 
 
     return render(request, 'home.html', {
