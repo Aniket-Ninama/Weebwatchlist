@@ -3,6 +3,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, include
 from application import views
+import os
 urlpatterns = [
     path('login', views.login_view, name='login'),
     path('signup', views.signup_view, name='signup'),
@@ -28,5 +29,6 @@ urlpatterns = [
     # For Development
     # path("__reload__/", include('django_browser_reload.urls'))
 ]
-# Serve media files in development
+# Serve media files in development and production
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

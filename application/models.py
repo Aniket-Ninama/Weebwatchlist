@@ -15,8 +15,8 @@ class AllPosts(models.Model):
         profile = getattr(self.user, "userprofile", None)
         if profile and profile.profile_picture:
             return profile.profile_picture.url
-        from django.templatetags.static import static
-        return static("images/img.png")
+        from django.conf import settings
+        return settings.MEDIA_URL + 'profile_pics/img.png'
     def __str__(self):
         return f"{self.user.username} - {self.created_at.strftime('%Y-%m-%d %H:%M')}"
 
@@ -37,10 +37,12 @@ class Comment(models.Model):
     @property
     def avatar_url(self):
         # Try to get from user profile first
-        if hasattr(self.user, 'profile') and hasattr(self.user.profile, 'avatar'):
-            return self.user.profile.avatar.url
-        # Otherwise return default
-        return "/static/images/img.png"
+        profile = getattr(self.user, "userprofile", None)
+        if profile and profile.profile_picture:
+            return profile.profile_picture.url
+        # Return default media file
+        from django.conf import settings
+        return settings.MEDIA_URL + 'profile_pics/img.png'
 
     def __str__(self):
         return f"Comment by {self.user.username} on {self.post}"
