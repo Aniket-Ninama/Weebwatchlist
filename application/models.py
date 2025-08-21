@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.templatetags.static import static
+import os
 # Create your models here.
 
 class AllPosts(models.Model):
@@ -100,12 +101,12 @@ class UserProfile(models.Model):
 
     @property
     def profile_picture_url(self):
-        if self.profile_picture:
+        if self.profile_picture and os.path.exists(self.profile_picture.path):
             return self.profile_picture.url
         return static('images/profile_pics/img.png')
 
     @property
     def cover_image_url(self):
-        if self.cover_image:
+        if self.cover_image and os.path.exists(self.cover_image.path):
             return self.cover_image.url
         return static('images/cover_pics/cover_page.jpg')
