@@ -2,6 +2,9 @@
 # Run migrations
 python manage.py migrate
 
+# Collect static files (outside Python block!)
+python manage.py collectstatic --noinput
+
 # Create superuser if it doesn't exist
 python - <<END
 import os
