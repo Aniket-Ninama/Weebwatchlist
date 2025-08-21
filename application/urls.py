@@ -26,7 +26,7 @@ urlpatterns = [
     path('delete-anime/<int:anime_id>/', views.delete_anime, name='delete_anime'),
     path('logout', views.logout_view, name='logout'),
     # For Development
-    path("__reload__/", include('django_browser_reload.urls'))
+    # path("__reload__/", include('django_browser_reload.urls'))
 ]
 # Serve media files in development
 # if settings.DEBUG:
