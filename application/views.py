@@ -274,7 +274,7 @@ def profile(request):
 def new_post(request):
     post_content = request.POST.get('content')
     if post_content:
-        AllPosts.objects.create(user=request.user,avatar_url="static/images/profile_pics/img.png" ,content=post_content)
+        AllPosts.objects.create(user=request.user,content=post_content)
     return redirect('home')
 
 @login_required(login_url='login')
