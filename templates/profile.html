@@ -23,7 +23,7 @@
             <div class="absolute -bottom-12 left-6">
                 <div class="relative">
                     <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-dark-800 bg-dark-700 overflow-hidden shadow-2xl">
-                        {% if user_profile.profile_picture %}
+                        {% if user_profile.profile_picture.profile_picture_url %}
                             <img src="{{ user_profile.profile_picture_url }}" alt="{{ user.username }}" class="w-full h-full object-cover">
                         {% else %}
                             <div class="w-full h-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">

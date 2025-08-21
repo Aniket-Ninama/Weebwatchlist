@@ -3,13 +3,13 @@
 python manage.py makemigrations --noinput
 python manage.py migrate
 
-# Collect static files (outside Python block!)
+# Collect static files
 python manage.py collectstatic --noinput
 
-# Create superuser if it doesn't exist
+# Create or update superuser
 python - <<END
 import os
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Weebwatchlist.settings')  # <--- add this
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Weebwatchlist.settings')
 import django
 django.setup()
 
@@ -19,8 +19,14 @@ username = os.environ.get("DJANGO_SUPERUSER_USERNAME", "admin")
 email = os.environ.get("DJANGO_SUPERUSER_EMAIL", "admin@example.com")
 password = os.environ.get("DJANGO_SUPERUSER_PASSWORD", "defaultpassword")
 
-if not User.objects.filter(username=username).exists():
-    User.objects.create_superuser(username, email, password)
+user, created = User.objects.get_or_create(username=username, defaults={"email": email})
+user.email = email
+user.is_superuser = True
+user.is_staff = True
+user.set_password(password)  # always reset to env password
+user.save()
+
+print(f"Superuser '{username}' ensured (created={created})")
 END
 
 # Start Gunicorn

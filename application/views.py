@@ -618,13 +618,8 @@ def post_detail(request, post_id):
     user_name = None
     if request.user.is_authenticated:
         user_name = request.user.username
-        try:
-            profile = UserProfile.objects.get(user=request.user)  # fetch from DB
-            if profile.profile_picture:
-                user_img = profile.profile_picture  # actual image URL from DB
-        except UserProfile.DoesNotExist:
-            user_img = None  # no profile found
-
+        profile = UserProfile.objects.get(user=request.user)  # fetch from DB
+        user_img = profile.profile_picture  # actual image URL from DB
     # Get all comments for this post, ordered by newest first
     # comments = post.comments.all().order_by('-created_at')
     context = {
