@@ -14,11 +14,9 @@
         <div class="relative">
             <!-- Cover Image -->
             <div class="h-48 sm:h-64 w-full rounded-xl overflow-hidden bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600">
-                {% if user_profile.cover_image %}
-                            <img src="{{ user_profile.cover_image.url }}"
+                            <img src="{{ user_profile.cover_image_url }}"
                                  alt="Cover"
                                  class="absolute inset-0 w-full h-full object-cover object-center rounded-xl" />
-                {% endif %}
             </div>
 
             <!-- Profile Picture -->
@@ -26,7 +24,7 @@
                 <div class="relative">
                     <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-dark-800 bg-dark-700 overflow-hidden shadow-2xl">
                         {% if user_profile.profile_picture %}
-                            <img src="{{ user_profile.profile_picture.url }}" alt="{{ user.username }}" class="w-full h-full object-cover">
+                            <img src="{{ user_profile.profile_picture_url }}" alt="{{ user.username }}" class="w-full h-full object-cover">
                         {% else %}
                             <div class="w-full h-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
                                 <i class="fas fa-user text-white text-2xl sm:text-3xl"></i>
